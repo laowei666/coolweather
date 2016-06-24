@@ -41,7 +41,7 @@ public class CoolWeatherDB {
 	 * 获取CoolWeatherDB的实例。同一时间只有一个线程执行
 	 */
 	public synchronized static CoolWeatherDB getInstance(Context context) {
-		if (coolWeatherDB != null) {
+		if (coolWeatherDB == null) {
 			coolWeatherDB = new CoolWeatherDB(context);
 		}
 		return coolWeatherDB;
@@ -55,14 +55,14 @@ public class CoolWeatherDB {
 			ContentValues values = new ContentValues();
 			values.put("province_name", province.getProvinceName());
 			values.put("province_code", province.getProvinceCode());
-			db.insert(DB_NAME, null, values);
+			db.insert("Province", null, values);
 		}
 	}
 
 	/**
 	 * 从数据库读取全国所有的省份信息。
 	 */
-	public List<Province> loadProvince() {
+	public List<Province> loadProvinces() {
 		List<Province> list = new ArrayList<Province>();
 		Cursor cursor = db.query("Province", null, null, null, null, null, null);
 		if (cursor.moveToFirst()) {
@@ -86,7 +86,7 @@ public class CoolWeatherDB {
 			values.put("city_name", city.getCityName());
 			values.put("city_code", city.getCityCode());
 			values.put("province_id", city.getProvinceId());
-			db.insert(DB_NAME, null, values);
+			db.insert("City", null, values);
 		}
 	}
 
@@ -117,7 +117,7 @@ public class CoolWeatherDB {
 		values.put("county_name", county.getCountyName());
 		values.put("county_code", county.getCountyCode());
 		values.put("city_id", county.getCityId());
-		db.insert(DB_NAME, null, values);
+		db.insert("County", null, values);
 	}
 
 	/**
@@ -138,6 +138,5 @@ public class CoolWeatherDB {
 		}
 		return list;
 	}
-	
-	
+
 }
