@@ -2,9 +2,13 @@ package com.app.coolweather.activity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -65,6 +69,16 @@ public class ChooseAreaActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// 如果已经选择了城市，直接跳转过去
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if (prefs.getBoolean("city_selected", false)) {
+			Intent intent = new Intent(this, WeatherActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
+
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.choose_area);
 
@@ -82,6 +96,12 @@ public class ChooseAreaActivity extends Activity {
 				} else if (currentLevel == LEVEL_CITY) {
 					selectedCity = cityList.get(position);
 					queryCounties();
+				} else if (currentLevel == LEVEL_COUNTY) {
+					County countyCode = countyList.get(position);
+					Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+					intent.putExtra("county_code", countyCode.getCountyCode());
+					startActivity(intent);
+					finish();
 				}
 			}
 		});
@@ -157,12 +177,11 @@ public class ChooseAreaActivity extends Activity {
 		}
 		showProgressDialog();
 		HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
-
 			@Override
 			public void onFinish(String response) {
 				boolean result = false;
 				if ("province".equals(type)) {
-					result = Utility.handleProvinceReponse(coolWeatherDB, response);
+					result = Utility.handleProvincesResponse(coolWeatherDB, response);
 				} else if ("city".equals(type)) {
 					result = Utility.handleCitiesResponse(coolWeatherDB, response, selectedProvince.getId());
 				} else if ("county".equals(type)) {

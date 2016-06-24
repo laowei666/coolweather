@@ -8,6 +8,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import android.util.Log;
+
 /**
  * 网络请求类
  */
@@ -35,6 +37,7 @@ public class HttpUtil {
 					}
 					if (listener != null) {
 						// 回调onFinish()方法
+						Log.e("data", response.toString());
 						listener.onFinish(response.toString());
 					}
 				} catch (Exception e) {
